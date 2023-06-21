@@ -3,4 +3,6 @@
 #include "drv_PWMOut.hpp"
 #include "stm32f10x_gpio.h"
 #include "Basic.hpp"
- #include "drv_PwmOut.hpp"
+#include "drv_PwmOut.hpp"
+
+void TraceMove(int TraceDate,float TarSpeed);

@@ -9,15 +9,7 @@ struct PID
 	float kd;
 };
 
-//默认向左转向 turn_speed为负数，向右转向turn_speed 为正数
 
-int get_speed(){
-
-
-
-
-	return 0;
-}
 //位置式PID控制器
 //用来控制转向
 int PositionPID(float deviation)

@@ -212,7 +212,7 @@ extern "C" void EXTI0_IRQHandler(void)
 delay_ms(20); //消抖
 if(KEY0==0) //按键 KEY2
 { 
-	Velocity_Kp+=5;
+
 }
 EXTI_ClearITPendingBit(EXTI_Line0); //清除 LINE2 上的中断标志位 
 }
