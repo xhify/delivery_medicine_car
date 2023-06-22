@@ -22,9 +22,12 @@ extern"C"{
 }
 
 RCC_ClocksTypeDef RCC_CLK;
-extern u8 Flag_Qian,Flag_Hou,Flag_Left,Flag_Right,Flag_sudu; 
+//决定程序正在运行的模式，也即题目
+int mode=0;
+
+int is_leader=1;//是否为领头小车
+//蓝牙通信传递的参数
 extern int data_array[9] ;
-extern int  uart_receive,turn90left,turn90right,turn180left,turn180right,turn360left,turn360right;
 extern char rec[80];
 float VDDA;//电池电压
 int L_code;
@@ -68,7 +71,7 @@ int main(void)
 	//MPU_Init();	
 	//while(mpu_dmp_init());
 		
-	Play();
+	//Play();
 
 	//LED闪烁
 	init_Commulink();
@@ -121,13 +124,13 @@ int main(void)
 
 		VDDA =Get_Adc_Average(12,5);
 		VDDA = VDDA *3.3*11*1.1/4096;
-		sprintf( str, "%3.1f", 0);
+		sprintf( str, "%d", mode);
 			LCD_ShowString(40,0,str,BLUE,WHITE,16,0);
 			//pitch
-			sprintf( str, "%3.1f", 0);
-			LCD_ShowString(40,16,str,BLUE,WHITE,16,0);
+			sprintf( str, "%d", is_leader);
+			LCD_ShowString(80,16,str,BLUE,WHITE,16,0);
 			//yaw
-			sprintf( str, "%3.1f",0);
+			sprintf( str, "%3.1f",0.0);
 			LCD_ShowString(40,32,str,BLUE,WHITE,16,0);
 		
 		/*获取姿态*/
@@ -144,7 +147,7 @@ int main(void)
 		
 		sprintf( str, "%6d",R_count);	
 		LCD_ShowString(48,96,str,BLUE,WHITE,16,0);
-		sprintf( str, "%6f",0);	
+		sprintf( str, "%6f",0.0);	
 		LCD_ShowString(0,144,str,BLUE,WHITE,16,0);	
 		
 		sprintf( str, "%6d",0);	
@@ -156,7 +159,7 @@ int main(void)
 	sprintf( str, "%6d",0);	
 		LCD_ShowString(0,176,str,BLUE,WHITE,16,0);	
 
-		sprintf( str, "%6.2f",0);	
+		sprintf( str, "%6.2f",0.0);	
 		LCD_ShowString(120,176,str,BLUE,WHITE,16,0);
 		
 		sprintf( str, "%6d",L_PWM);	
@@ -167,15 +170,15 @@ int main(void)
 		
 		sprintf( str, "%2.2f",VDDA);	
 		LCD_ShowString(160,0,str,BLUE,WHITE,16,0);	
-		
-		sprintf( str, "%d",uart_receive);	
-		LCD_ShowString(0,208,str,BLUE,WHITE,16,0);
+	
 		
 		LCD_ShowString(0,208,rec,BLUE,WHITE,16,0);
 
-		length=UltraSonic_valuetance();
+	//	length=UltraSonic_valuetance();
 		sprintf( str, "%4.2f",length );
 		LCD_ShowString(0,224,str,BLUE,WHITE,16,0);
+		
+		
 	}
 }
 
@@ -193,7 +196,6 @@ extern "C" void TIM2_IRQHandler(void)
 		
 		R_PWMset(R_PWM);
 		L_PWMset(L_PWM);
-	
 		L_code =Read_Encoder(4);
 		L_count+=L_code;
 		R_code =Read_Encoder(3);

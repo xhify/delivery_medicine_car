@@ -6,7 +6,7 @@
 //长按标识
 int tran = 0;
 static u16 Press_count;
-extern float Balance_Kp,Middle_angle,Velocity_Kp;
+extern int mode,R_PWM;
 #define KEY0  GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_0)//读取按键0
 /**************************************************************************
 函数功能：按键切换
@@ -209,10 +209,11 @@ NVIC_InitTypeDef NVIC_InitStructure;
 }
 extern "C" void EXTI0_IRQHandler(void)
 {
-delay_ms(20); //消抖
+delay_ms(50); //消抖
 if(KEY0==0) //按键 KEY2
 { 
-
+	mode+=1;
 }
 EXTI_ClearITPendingBit(EXTI_Line0); //清除 LINE2 上的中断标志位 
+delay_us(1);
 }

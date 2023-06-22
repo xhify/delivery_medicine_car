@@ -6,7 +6,7 @@
 
 #define KEY PCin(0)   
 //是否使用硬件去抖
-#define Is_Detrembling 0
+#define Is_Detrembling 1
 
 void init_drv_Key(void);       	//按键初始化
 u8 click_N_Double (u16 time);  	//单击按键扫描和双击按键扫描

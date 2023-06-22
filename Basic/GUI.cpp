@@ -312,12 +312,12 @@ static void GUI_Server()
 	char str[50];
 
 	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-	char Rol[]={"Rol:     "};
-	char Pit[]={"Pit:     "};
+	char Mode[]={"Mode:     "};
+	char Is_Leader[]={"Is_Leader:     "};
 	char YaW[]={"Yaw:     "};
 
-	LCD_ShowString(0,0,Rol,RED,WHITE,16,0);
-	LCD_ShowString(0,16,Pit,RED,WHITE,16,0);
+	LCD_ShowString(0,0,Mode,RED,WHITE,16,0);
+	LCD_ShowString(0,16,Is_Leader,RED,WHITE,16,0);
 	LCD_ShowString(0,32,YaW,RED,WHITE,16,0);
 	sendLedSignal(LEDSignal_Start2);		
 		sprintf( str, "left:");
