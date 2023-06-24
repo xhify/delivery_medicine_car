@@ -2,23 +2,23 @@
 #include "drv_Encoder.hpp"
 
 
-struct PID
-{
-	float kp;
-	float ki;
-	float kd;
-};
 
+
+struct PID position_PID,speed_PID;
+
+
+int L_code;
+int R_code;
+int L_PWM ,R_PWM;
+float L_speed, R_speed;
 
 //位置式PID控制器
 //用来控制转向
 int PositionPID(float deviation)
 {
-	PID pid;
-	pid.kp=100;
-	pid.ki=0;
-	pid.kp=-30;
-	float Position_KP=pid.kp,Position_KI=pid.ki,Position_KD=pid.kd;
+	
+	
+	float Position_KP=position_PID.kp,Position_KI=position_PID.ki,Position_KD=position_PID.kd;
 	static float Bias,Pwm,Integral_bias,Last_Bias;
 	Bias=deviation;                         		         //计算偏差
 	Integral_bias+=Bias;	                                 //求出偏差的积分
@@ -26,12 +26,27 @@ int PositionPID(float deviation)
 	Last_Bias=Bias;                                      	 //保存上一次偏差 
 	return Pwm;    
 }
-int PositionPIDToSpd(float deviation)
+int L_SpeedPID(float deviation)
 {
-	PID pid;
-	pid.kp=-50;pid.ki=-6;pid.kd=0;
+	
 	int MAX_MOTOR_PWM=7000;
-	float Position_KP=pid.kp,Position_KI=pid.ki,Position_KD=pid.kd;
+	float Position_KP=speed_PID.kp,Position_KI=speed_PID.ki,Position_KD=speed_PID.kd;
+	static float Bias,Pwm,Integral_bias,Last_Bias,pwmKI=0;
+	
+	Bias=deviation;                         		         //计算偏差
+	Integral_bias+=Bias;	                                 //求出偏差的积分
+	pwmKI=Position_KI*Integral_bias;
+	if(pwmKI>MAX_MOTOR_PWM) Integral_bias=MAX_MOTOR_PWM/Position_KI;
+	
+	Pwm=Position_KP*Bias+pwmKI+Position_KD*(Bias-Last_Bias);       //位置式PID控制器
+	Last_Bias=Bias;                                      	 //保存上一次偏差 
+	return Pwm;    
+}
+int R_SpeedPID(float deviation)
+{
+	
+	int MAX_MOTOR_PWM=7000;
+	float Position_KP=speed_PID.kp,Position_KI=speed_PID.ki,Position_KD=speed_PID.kd;
 	static float Bias,Pwm,Integral_bias,Last_Bias,pwmKI=0;
 	Bias=deviation;                         		         //计算偏差
 	Integral_bias+=Bias;	                                 //求出偏差的积分
@@ -40,15 +55,6 @@ int PositionPIDToSpd(float deviation)
 	Pwm=Position_KP*Bias+pwmKI+Position_KD*(Bias-Last_Bias);       //位置式PID控制器
 	Last_Bias=Bias;                                      	 //保存上一次偏差 
 	return Pwm;    
-}
-
-int ChangeTraceTurn(int TraceDate)
-{
-	int pwm=0;
-	int bias;
-	bias=TraceDate;
-	pwm=PositionPID(bias);
-	return pwm;
 }
 
 /*@brief:根据pid调节左边电机到目标速度
@@ -63,8 +69,11 @@ int ChangeSpeedMotorL(int NowEncodeSpdL,float TarSpdL)
 	int bias;
 	int TarEncodeSpdL;
 	//TarEncodeSpdL=(int)((TarSpdL*ACircleEncoder)/(WheelOneCircleDis*100)+0.5f);//根据目标速度求出目标编码器速度
-	bias=NowEncodeSpdL-TarEncodeSpdL;
-	pwm=PositionPIDToSpd(bias);
+	TarEncodeSpdL=(int)(TarSpdL/3.14/0.07*1560*0.005);
+	
+		
+	bias=TarEncodeSpdL - NowEncodeSpdL;
+	pwm=L_SpeedPID(bias);
 	return pwm;
 }
 
@@ -80,7 +89,10 @@ int ChangeSpeedMotorR(int NowEncodeSpdR,float TarSpdR)
 	int bias;
 	int TarEncodeSpdR;
 	//TarEncodeSpdR=(int)((TarSpdR*ACircleEncoder)/(WheelOneCircleDis*100)+0.5f);//根据目标速度求出目标编码器速度
-	bias=NowEncodeSpdR-TarEncodeSpdR;
+	TarEncodeSpdR=(int)(TarSpdR/3.14/0.07*1560*0.005);
+
+	bias=TarEncodeSpdR - NowEncodeSpdR;
+	pwm=L_SpeedPID(bias);
 	return pwm;
 }
 
@@ -94,26 +106,25 @@ void TraceMove(int TraceDate,float TarSpeed)
 {
 	int turnpwm=0;
 	int spdpwml=0,spdpwmr=0;
-	int pwml=0,pwmr=0;
-	
-	turnpwm=ChangeTraceTurn(TraceDate);
-	
-	int Encode_Left=Read_Encoder(4);
-	int Encode_Right= Read_Encoder(3);
-	
-	spdpwml=ChangeSpeedMotorL(Encode_Left,TarSpeed);
-	spdpwmr=ChangeSpeedMotorR(Encode_Right,TarSpeed);
 	
 	
-	pwmr=turnpwm+spdpwmr;
+	turnpwm=PositionPID(TraceDate);
 	
-	pwml=-turnpwm+spdpwml;
+	L_code=Read_Encoder(4);
+	R_code= -Read_Encoder(3);
+	R_speed =(float)(R_code*200.0/1560.0*0.07*3.14);
+	L_speed = L_code*200/1560.0*0.07*3.14;
+	spdpwml=ChangeSpeedMotorL(L_code,TarSpeed);
+	spdpwmr=ChangeSpeedMotorR(R_code,TarSpeed);
 	
 	
-	R_PWMset(pwmr);
-	L_PWMset(pwml);
+	R_PWM=turnpwm+spdpwmr;
+	L_PWM=-turnpwm+spdpwml;
 	
-
+	//R_PWM=2000;
+	//L_PWM=2000;
+	R_PWMset(R_PWM);
+	L_PWMset(L_PWM);
 }
 
 

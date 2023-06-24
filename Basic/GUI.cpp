@@ -314,7 +314,7 @@ static void GUI_Server()
 	LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
 	char Mode[]={"Mode:     "};
 	char Is_Leader[]={"Is_Leader:     "};
-	char YaW[]={"Yaw:     "};
+	char YaW[]={"Speed:     "};
 
 	LCD_ShowString(0,0,Mode,RED,WHITE,16,0);
 	LCD_ShowString(0,16,Is_Leader,RED,WHITE,16,0);
@@ -324,9 +324,9 @@ static void GUI_Server()
 			LCD_ShowString(0,48,str,RED,WHITE,16,0);
 		sprintf( str, "right:");		
 			LCD_ShowString(0,64,str,RED,WHITE,16,0);
-		sprintf( str, "L_cnt:");	
+		sprintf( str, "L_angle:");	
 		LCD_ShowString(0,80,str,RED,WHITE,16,0);
-		sprintf( str, "R_cnt:");	
+		sprintf( str, "R_angle:");	
 		LCD_ShowString(0,96,str,RED,WHITE,16,0);
 		sprintf( str, "L_PWM:");	
 		LCD_ShowString(0,112,str,RED,WHITE,16,0);

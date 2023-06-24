@@ -5,4 +5,10 @@
 #include "Basic.hpp"
 #include "drv_PwmOut.hpp"
 
+struct PID
+{
+	float kp;
+	float ki;
+	float kd;
+};
 void TraceMove(int TraceDate,float TarSpeed);

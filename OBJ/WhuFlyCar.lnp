@@ -45,6 +45,8 @@
 "..\obj\drv_beep.o"
 "..\obj\control.o"
 "..\obj\drv_hcsr04.o"
+"..\obj\drv_uart3.o"
+"..\obj\drv_uart3_1.o"
 "..\obj\basic.o"
 "..\obj\font.o"
 "..\obj\gui.o"

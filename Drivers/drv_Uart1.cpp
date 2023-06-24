@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #define DATA_COUNT 9 // 数据的数量
  u8 Flag_Qian=0,Flag_Hou=0,Flag_Left=0,Flag_Right=0,Flag_sudu=2;
- int uart_receive=0;
+int uart_receive=0;
  
  int turn90left=0,turn90right=0,turn180left=0,turn180right=0,turn360left=0,turn360right=0;
  int data_array[DATA_COUNT] = {0}; // 用于存储解析的整数数据

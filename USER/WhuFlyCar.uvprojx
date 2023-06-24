@@ -727,6 +727,16 @@
               <FileType>5</FileType>
               <FilePath>..\Drivers\drv_hcsr04.h</FilePath>
             </File>
+            <File>
+              <FileName>drv_Uart3.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Drivers\drv_Uart3.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>drv_Uart3.hpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Drivers\drv_Uart3.hpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
