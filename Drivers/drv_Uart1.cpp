@@ -164,6 +164,11 @@ extern "C" void USART1_IRQHandler(void)
 														Flag_Qian=0,Flag_Hou=0,Flag_Left=0,Flag_Right=1;  //左
 			else if(uart_receive==0x46||uart_receive==0x47||uart_receive==0x48)	    //右
 														Flag_Qian=0,Flag_Hou=0,Flag_Left=1,Flag_Right=0;
+			else if(uart_receive == 0x61)//接受到 ’a'
+			{
+				for(int i=0;i < 10; i++)
+					data_array[i]=0;				
+			}
 			else if(uart_receive ==0x62)						//左转90度
 														turn90left=1;//turn180left=0,turn180right=0,turn360left=0,turn360right=0
 			else if(uart_receive ==0x63)

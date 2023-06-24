@@ -43,7 +43,7 @@ char str[50];
 extern struct PID position_PID,speed_PID;
 extern int pwml,pwmr;
 int L_angle,R_angle;
-
+extern float lengths;
 //º¯ÊýÔ­ÐÍ
 float targer_speed = 0.1;
 void TIM2_Int_Init(u16 arr,u16 psc);
@@ -206,8 +206,8 @@ int main(void)
 		LCD_ShowString(0,208,rec,BLUE,WHITE,16,0);
 		
 	
-		//length=UltraSonic_valuetance();
-		sprintf( str, "%4.2f",length );
+		length=UltraSonic_valuetance();
+		sprintf( str, "%4.2f",lengths );
 		LCD_ShowString(0,224,str,BLUE,WHITE,16,0);
 		//printf("hello world");
 		

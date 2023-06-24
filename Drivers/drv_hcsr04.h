@@ -7,8 +7,8 @@
 #define HCSR04_PORT    		 GPIOB
 #define HCSR04_CLK    	   RCC_APB2Periph_GPIOB
 #define HCSR04_TIM_CLK     RCC_APB1Periph_TIM5
-#define HCSR04_TRIG   	   GPIO_Pin_8
-#define HCSR04_ECHO        GPIO_Pin_9
+#define HCSR04_TRIG   	   GPIO_Pin_9
+#define HCSR04_ECHO        GPIO_Pin_8
 
 void hcsr04Init(void);
 float UltraSonic_valuetance(void);
