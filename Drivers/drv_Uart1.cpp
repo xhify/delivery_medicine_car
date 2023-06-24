@@ -12,11 +12,14 @@ int uart_receive=0;
 int data_index = 0; // 当前数据索引
 bool inside_brackets = false; // 是否在大括号内
 char buffer[7]; // 临时存储数据的字符缓冲区，最大6位数字加上字符串结尾
+int blue_flag_stop=0;
+int blue_flag_wait =0;
 int buffer_index = 0; // 缓冲区索引
 bool update_single_value = false; // 是否仅更新单个值
 bool all_parameters = false; // 是否更新所有参数
 bool read_index = false; // 是否读取索引
  char rec[80];
+ extern int mode;
  int in=0;
 /*
  * 函数功能：串口1初始化
@@ -169,18 +172,23 @@ extern "C" void USART1_IRQHandler(void)
 				for(int i=0;i < 10; i++)
 					data_array[i]=0;				
 			}
-			else if(uart_receive ==0x62)						//左转90度
-														turn90left=1;//turn180left=0,turn180right=0,turn360left=0,turn360right=0
-			else if(uart_receive ==0x63)
-														turn90right=1;
-			else if(uart_receive ==0x64)
-														turn180left=1;
-			else if(uart_receive ==0x65)
-														turn180right=1;
-			else if(uart_receive ==0x66)
-														turn360left=1;
-			else if(uart_receive ==0x67)
-														turn360right=1;
+			else if(uart_receive ==0x62)//				'b'	
+														mode = 0;
+			else if(uart_receive ==0x63)//    c
+														mode =1;
+			else if(uart_receive ==0x64)//   d
+														mode =2;
+			else if(uart_receive ==0x65)//		e
+														mode =3;
+			else if(uart_receive ==0x66)//    f
+														blue_flag_stop=3;
+			else if(uart_receive ==0x67)//		g
+														blue_flag_stop = 2;
+			else if(uart_receive ==0x68)//		h
+														blue_flag_stop = 1;
+			else if(uart_receive ==0x69)//		i
+														blue_flag_wait = 1;
+			
 			else {Flag_Qian=0,Flag_Hou=0,Flag_Left=0,Flag_Right=0,turn90left=0,turn90right=0;//////////////刹车
 				turn180left=0,turn180right=0,turn360left=0,turn360right=0;
   	}

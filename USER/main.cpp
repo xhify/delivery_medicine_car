@@ -44,6 +44,13 @@ extern struct PID position_PID,speed_PID;
 extern int pwml,pwmr;
 int L_angle,R_angle;
 extern float lengths;
+int enter_cross=0;
+int cross_cnt=0;//岔路口检测
+int circle=0;//统计圈数从岔路口出来即为完成一圈。
+int flag_stop=0;
+int flag_wait=0;
+int wait_time=0;
+extern int blue_flag_stop , blue_flag_wait;//蓝牙传递的停车标志
 //函数原型
 float targer_speed = 0.1;
 void TIM2_Int_Init(u16 arr,u16 psc);
@@ -110,13 +117,7 @@ int main(void)
 
 
 	//进入主循环
-/*
-	data_array[0]=Balance_Kp;
-	data_array[1]=Balance_Kd;
-	data_array[2]=Velocity_Kp;
-	data_array[3]=Middle_angle*100+1000;
-*/
-	
+
 	
 	float length;
 	
@@ -134,9 +135,8 @@ int main(void)
 		speed_PID.kp =data_array[6]/100.0;
 		speed_PID.ki =data_array[7]/100.0;
 		speed_PID.kd =data_array[8]/100.0;
-	
-		L_angle=openmv_data_array[0];
-		R_angle=openmv_data_array[1];
+		
+		
 		
 		VDDA =Get_Adc_Average(12,5);
 		VDDA = VDDA *3.3*11*1.1/4096;
@@ -219,6 +219,7 @@ int main(void)
 
 extern "C" void TIM2_IRQHandler(void) 
 {
+	//频率为0.005s,200hz
 	//检查 TIM2更新 中断发生与否
 	int index;
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) 
@@ -226,11 +227,156 @@ extern "C" void TIM2_IRQHandler(void)
 		//清除 TIM2更新 中断 标志
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update ); 			
 		
+		
+		L_angle=openmv_data_array[0];
+		R_angle=openmv_data_array[1];
+		if(is_leader ==1)
+		{
+			flag_stop = openmv_data_array[3];//3表示停止线位于远，2表示停止线位于中，1表示停止线位于近，0则表示无停止线。
+			flag_wait = openmv_data_array[4];//1表示检测到等待停止线
+		}
+		else
+		{
+			if(openmv_data_array[3] >0 && blue_flag_stop > 0)
+			{
+				if(openmv_data_array[3] < blue_flag_stop)
+					flag_stop =openmv_data_array[3];
+				else
+					flag_stop =blue_flag_stop;
+			}
+			else
+				flag_stop = openmv_data_array[3] || blue_flag_stop;
+			
+			flag_wait = openmv_data_array[4] || blue_flag_wait ;//1表示检测到等待停止线
+		}
 		int L_bias=L_angle-90;
 		int R_bias=R_angle-90;
 		
 		
-		TraceMove(L_bias,targer_speed);
+		
+		//总控制部分
+		
+		//岔路口检测部分
+		if(L_angle != R_angle)
+				cross_cnt++;
+			//累积1.5s的时长检测到有两条路，则说明进入了岔路口
+			if(cross_cnt > 300 && enter_cross ==0 && L_angle == R_angle)
+			{
+				enter_cross =1;
+				cross_cnt =0;
+			}	
+			
+			//累积1.5s的时长检测到有两条路，则说明离开了岔路口
+			if(cross_cnt > 300 && enter_cross ==1 && L_angle == R_angle)
+			{
+				enter_cross =0;
+				cross_cnt =0;
+				circle +=1;
+			}
+		
+		//领头小车 模式1 
+		//沿外圈走一圈停车
+		if(is_leader == 1 && mode == 0)
+		{
+			targer_speed = 0.3;
+					
+			if(flag_stop == 3 && circle ==1)
+				TraceMove(R_bias,0.2); 
+			else if( flag_stop == 2 && circle ==1)
+				TraceMove(R_bias,0.1); 
+			else if( flag_stop == 1 && circle ==1)
+				TraceMove(0,0);//停车
+			else if(enter_cross == 1)
+				TraceMove(L_bias,targer_speed);
+			else 
+				TraceMove(R_bias,targer_speed);
+				
+		}
+		//领头小车 模式2
+		//沿外圈走两圈到 A点停止，即停止线停止
+		if(is_leader == 1 && mode == 1)
+		{
+			targer_speed = 0.5;
+					
+			if(flag_stop == 3 && circle ==2)
+				TraceMove(R_bias,0.2); 
+			else if( flag_stop == 2 && circle ==2)
+				TraceMove(R_bias,0.1); 
+			else if( flag_stop == 1 && circle ==2)
+				TraceMove(0,0);//停车
+			else if(enter_cross == 1)
+				TraceMove(L_bias,targer_speed);
+			else 
+				TraceMove(R_bias,targer_speed);
+				
+		}
+		
+		//领头小车 模式3
+		//外圈-外圈-内圈，速度大于0.3即可，A点停止，即停止线停止
+		
+		
+		if(is_leader == 1 && mode == 2)
+		{
+			targer_speed = 0.5;
+					
+			if(flag_stop == 3 && circle ==3)
+				TraceMove(R_bias,0.2); 
+			else if( flag_stop == 2 && circle ==3)
+				TraceMove(R_bias,0.1); 
+			else if( flag_stop == 1 && circle ==3)
+				TraceMove(0,0);//停车
+			else if( circle ==2)
+				TraceMove(L_bias,targer_speed);
+			else 
+				TraceMove(R_bias,targer_speed);
+				
+		}
+		
+		//领头小车 模式4
+		//沿外圈走一圈 ，E点等五秒,速度为1
+		if(is_leader == 1 && mode == 0)
+		{
+			targer_speed = 1;
+					
+			if(flag_stop == 3 && circle ==1)
+				TraceMove(R_bias,0.2); 
+			else if( flag_stop == 2 && circle ==1)
+				TraceMove(R_bias,0.1); 
+			else if( flag_stop == 1 && circle ==1)
+				TraceMove(0,0);//停车
+			
+			else if ( flag_wait ==1 && wait_time <=1000)
+			{
+				TraceMove(0,0);//停车
+				wait_time ++;
+			}		
+			else if(enter_cross == 1)
+				TraceMove(L_bias,targer_speed);
+			else 
+				TraceMove(R_bias,targer_speed);				
+		}
+		
+		//追随小车 模式1
+		
+		if(is_leader == 0 && mode == 0)
+		{
+			targer_speed = 0.3;
+					
+			if(flag_stop == 3 && circle ==1)
+				TraceMove(R_bias,0.2); 
+			else if( flag_stop == 2 && circle ==1)
+				TraceMove(R_bias,0.1); 
+			else if( flag_stop == 1 && circle ==1)
+				TraceMove(0,0);//停车
+			else if(enter_cross == 1)
+				TraceMove(L_bias,targer_speed);
+			else 
+				TraceMove(R_bias,targer_speed);
+				
+		}
+		
+		
+		
 	}
 }
 
