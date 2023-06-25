@@ -5,7 +5,10 @@ extern int Length;
 int Val=0;
 int countnum=0;
 int time=0;
+float length=0;
 float lengths=0;
+float sum=0;
+int cnt=0;
 void hcsr04Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -82,7 +85,7 @@ extern "C" void TIM5_IRQHandler(void)
 	if(TIM_GetITStatus(TIM5,TIM_IT_Update)!=RESET)
 	{
 		TIM_ClearITPendingBit(TIM5,TIM_IT_Update);
-		countnum++;
+		
 	}
 }
 
@@ -91,24 +94,40 @@ extern "C" void EXTI9_5_IRQHandler(void)
 
 	if(EXTI_GetITStatus(EXTI_Line8)!=RESET)//判断某个线上的中断是否发生 
 {
-		//delay_ms(1);
+
 		if(GPIO_ReadInputDataBit(HCSR04_PORT,HCSR04_ECHO)==1)
+		{
 			TIM_Cmd(TIM5,ENABLE); 
+	    cnt++;
+		}	
 		else
 		{
 				TIM_Cmd(TIM5,DISABLE); 
-				time=int(TIM_GetCounter(TIM5)+countnum*65535);
+				time=int (TIM_GetCounter(TIM5));
 				lengths=(time)*17/1000.0;
 			if(lengths<=0)
 			{
 				lengths=0;
 			}
-			TIM_SetCounter(TIM5,0);  //取出TIM5的counter寄存器里的值
+			if(cnt!=5)
+			{
+			sum+=lengths;
+			
+			}
+			else
+			{
+				length=sum/4.0;
+				sum=0;
+				cnt=0;
+				
+			}
+		TIM_SetCounter(TIM5,0);  //取出TIM5的counter寄存器里的值
 		}
 			
 			
 EXTI_ClearITPendingBit(EXTI_Line8); //清除 LINE12 上的中断标志位  
 }
 }
+
 
 

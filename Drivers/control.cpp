@@ -4,14 +4,14 @@
 
 
 
-struct PID position_PID,speed_PID;
+struct PID position_PID,speed_PID,distance_PID;
 
 
 int L_code;
 int R_code;
 int L_PWM ,R_PWM;
 float L_speed, R_speed;
-
+extern float length;
 //位置式PID控制器
 //用来控制转向
 int PositionPID(float deviation)
@@ -56,6 +56,23 @@ int R_SpeedPID(float deviation)
 	Last_Bias=Bias;                                      	 //保存上一次偏差 
 	return Pwm;    
 }
+
+float DistancePID(float length)
+{
+	
+	float bias,Integral_bias,last_bias;
+	int LengthTarspeed;
+	if(length<40.0)
+		bias = 20.0-length;
+	else
+		bias = 20.0;
+	Integral_bias+=bias;	            //求出偏差的积分                   
+	LengthTarspeed=distance_PID.kp*bias + distance_PID.ki*Integral_bias + distance_PID.kd * (bias - last_bias);
+	last_bias=bias;
+	return LengthTarspeed;
+}
+
+
 
 /*@brief:根据pid调节左边电机到目标速度
  * @param:
@@ -106,7 +123,7 @@ void TraceMove(int TraceDate,float TarSpeed)
 {
 	int turnpwm=0;
 	int spdpwml=0,spdpwmr=0;
-	
+	float distancespd=0;
 	
 	turnpwm=PositionPID(TraceDate);
 	
@@ -114,8 +131,9 @@ void TraceMove(int TraceDate,float TarSpeed)
 	R_code= -Read_Encoder(3);
 	R_speed =(float)(R_code*200.0/1560.0*0.07*3.14);
 	L_speed = L_code*200/1560.0*0.07*3.14;
-	spdpwml=ChangeSpeedMotorL(L_code,TarSpeed);
-	spdpwmr=ChangeSpeedMotorR(R_code,TarSpeed);
+	
+	spdpwml=ChangeSpeedMotorL(L_code,TarSpeed + distancespd);
+	spdpwmr=ChangeSpeedMotorR(R_code,TarSpeed + distancespd);
 	
 	
 	R_PWM=turnpwm+spdpwmr;

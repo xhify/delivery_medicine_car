@@ -40,17 +40,23 @@ int L_count=0;
 int R_count=0;;
 extern int L_PWM ,R_PWM;
 char str[50];
-extern struct PID position_PID,speed_PID;
+extern struct PID position_PID,speed_PID,distance_PID;
 extern int pwml,pwmr;
 int L_angle,R_angle;
-extern float lengths;
+extern float length;
+float distance_speed=0;
 int enter_cross=0;
-int cross_cnt=0;//岔路口检测
+int cross_cnt=0;//岔路口检测3.
+int i=0;
 int circle=0;//统计圈数从岔路口出来即为完成一圈。
 int flag_stop=0;
 int flag_wait=0;
 int wait_time=0;
 extern int blue_flag_stop , blue_flag_wait;//蓝牙传递的停车标志
+
+extern float G_X,G_Z,G_Y;
+
+float angle_z=0;
 //函数原型
 float targer_speed = 0.1;
 void TIM2_Int_Init(u16 arr,u16 psc);
@@ -80,8 +86,8 @@ int main(void)
 	BEEP_Init();
 	
 	//关闭了mpu6050的初始化
-	//MPU_Init();	
-	//while(mpu_dmp_init());
+	MPU_Init();	
+	while(mpu_dmp_init());
 		
 	//Play();
 
@@ -119,7 +125,7 @@ int main(void)
 	//进入主循环
 
 	
-	float length;
+	
 	
 	speed_PID.kp = 100;
 	speed_PID.ki =0;
@@ -128,13 +134,16 @@ int main(void)
 //while 1执行频率为0.1s
 	while(1)
 	{	
-				position_PID.kp =data_array[0]/10.0;
+		position_PID.kp =data_array[0]/10.0;
 		position_PID.ki =data_array[1]/10000.0;
-		position_PID.kd =data_array[2]/100.0;
+		position_PID.kd =-data_array[2]/100.0;
 		targer_speed  =data_array[3]/100.0;
+		
+		distance_PID.kp =data_array[4]/10000.0;
+		distance_PID.ki =-data_array[4]/10000.0;
 		speed_PID.kp =data_array[6]/100.0;
 		speed_PID.ki =data_array[7]/100.0;
-		speed_PID.kd =data_array[8]/100.0;
+		speed_PID.kd =-data_array[8]/1000.0;
 		
 		
 		
@@ -199,18 +208,24 @@ int main(void)
 		sprintf( str, "%4.2f",speed_PID.kd);	
 		LCD_ShowString(160,160,str,BLUE,WHITE,16,0);	
 		
+		sprintf( str, "%4.2f",angle_z);	
+		LCD_ShowString(160,176,str,BLUE,WHITE,16,0);
+		
+		sprintf( str, "%4.2f",G_Z);	
+		LCD_ShowString(0,176,str,BLUE,WHITE,16,0);
+		
 		sprintf( str, "%2.2f",VDDA);	
 		LCD_ShowString(160,0,str,BLUE,WHITE,16,0);	
-	
+		
 		
 		LCD_ShowString(0,208,rec,BLUE,WHITE,16,0);
 		
 	
-		length=UltraSonic_valuetance();
-		sprintf( str, "%4.2f",lengths );
+		
+		sprintf( str, "%4.2f",length);
 		LCD_ShowString(0,224,str,BLUE,WHITE,16,0);
 		//printf("hello world");
-		
+		UltraSonic_valuetance();
 	}
 }
 
@@ -225,9 +240,11 @@ extern "C" void TIM2_IRQHandler(void)
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) 
 	{
 		//清除 TIM2更新 中断 标志
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update ); 			
-		
-		
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update ); 	
+		//if(i >= 10)
+		Get_Angle(2);
+		angle_z+=(G_Z+0.55)*0.005;			
+		i++;
 		L_angle=openmv_data_array[0];
 		R_angle=openmv_data_array[1];
 		if(is_leader ==1)
@@ -245,7 +262,7 @@ extern "C" void TIM2_IRQHandler(void)
 					flag_stop =blue_flag_stop;
 			}
 			else
-				flag_stop = openmv_data_array[3] || blue_flag_stop;
+				flag_stop = openmv_data_array[3] + blue_flag_stop;
 			
 			flag_wait = openmv_data_array[4] || blue_flag_wait ;//1表示检测到等待停止线
 		}
@@ -257,7 +274,7 @@ extern "C" void TIM2_IRQHandler(void)
 		//总控制部分
 		
 		//岔路口检测部分
-		if(L_angle != R_angle)
+		/*if(L_angle != R_angle)
 				cross_cnt++;
 			//累积1.5s的时长检测到有两条路，则说明进入了岔路口
 			if(cross_cnt > 300 && enter_cross ==0 && L_angle == R_angle)
@@ -273,21 +290,20 @@ extern "C" void TIM2_IRQHandler(void)
 				cross_cnt =0;
 				circle +=1;
 			}
+		*/
 		
 		//领头小车 模式1 
 		//沿外圈走一圈停车
 		if(is_leader == 1 && mode == 0)
 		{
-			targer_speed = 0.3;
+			//targer_speed = 0.3;
 					
-			if(flag_stop == 3 && circle ==1)
+			if(flag_stop == 3 && angle_z >=340)
 				TraceMove(R_bias,0.2); 
-			else if( flag_stop == 2 && circle ==1)
+			else if( flag_stop == 2 && angle_z >=340)
 				TraceMove(R_bias,0.1); 
-			else if( flag_stop == 1 && circle ==1)
+			else if( flag_stop == 1 && angle_z >=340)
 				TraceMove(0,0);//停车
-			else if(enter_cross == 1)
-				TraceMove(L_bias,targer_speed);
 			else 
 				TraceMove(R_bias,targer_speed);
 				
@@ -296,16 +312,14 @@ extern "C" void TIM2_IRQHandler(void)
 		//沿外圈走两圈到 A点停止，即停止线停止
 		if(is_leader == 1 && mode == 1)
 		{
-			targer_speed = 0.5;
+			//targer_speed = 0.5;
 					
-			if(flag_stop == 3 && circle ==2)
-				TraceMove(R_bias,0.2); 
-			else if( flag_stop == 2 && circle ==2)
-				TraceMove(R_bias,0.1); 
-			else if( flag_stop == 1 && circle ==2)
+			if(flag_stop == 3 && angle_z >=700)
+				TraceMove(R_bias,0.05); 
+			else if( flag_stop == 2 && angle_z >=700)
+				TraceMove(R_bias,0.05); 
+			else if( flag_stop == 1 && angle_z >=700)
 				TraceMove(0,0);//停车
-			else if(enter_cross == 1)
-				TraceMove(L_bias,targer_speed);
 			else 
 				TraceMove(R_bias,targer_speed);
 				
@@ -317,15 +331,15 @@ extern "C" void TIM2_IRQHandler(void)
 		
 		if(is_leader == 1 && mode == 2)
 		{
-			targer_speed = 0.5;
+			//targer_speed = 0.5;
 					
-			if(flag_stop == 3 && circle ==3)
+			if(flag_stop == 3 && angle_z >=1000)
 				TraceMove(R_bias,0.2); 
-			else if( flag_stop == 2 && circle ==3)
+			else if( flag_stop == 2 && angle_z >=1000)
 				TraceMove(R_bias,0.1); 
-			else if( flag_stop == 1 && circle ==3)
+			else if( flag_stop == 1 && angle_z >=1000)
 				TraceMove(0,0);//停车
-			else if( circle ==2)
+			else if( angle_z >=700)
 				TraceMove(L_bias,targer_speed);
 			else 
 				TraceMove(R_bias,targer_speed);
@@ -336,13 +350,13 @@ extern "C" void TIM2_IRQHandler(void)
 		//沿外圈走一圈 ，E点等五秒,速度为1
 		if(is_leader == 1 && mode == 0)
 		{
-			targer_speed = 1;
+			//targer_speed = 1;
 					
-			if(flag_stop == 3 && circle ==1)
+			if(flag_stop == 3 && angle_z >=340)
 				TraceMove(R_bias,0.2); 
-			else if( flag_stop == 2 && circle ==1)
+			else if( flag_stop == 2 && angle_z >=340)
 				TraceMove(R_bias,0.1); 
-			else if( flag_stop == 1 && circle ==1)
+			else if( flag_stop == 1 && angle_z >=340)
 				TraceMove(0,0);//停车
 			
 			else if ( flag_wait ==1 && wait_time <=1000)
@@ -362,20 +376,37 @@ extern "C" void TIM2_IRQHandler(void)
 		{
 			targer_speed = 0.3;
 					
-			if(flag_stop == 3 && circle ==1)
+			if(flag_stop == 3 && angle_z >=340)
 				TraceMove(R_bias,0.2); 
-			else if( flag_stop == 2 && circle ==1)
+			else if( flag_stop == 2 && angle_z >=340)
 				TraceMove(R_bias,0.1); 
-			else if( flag_stop == 1 && circle ==1)
+			else if( flag_stop == 1 && angle_z >=340)
 				TraceMove(0,0);//停车
-			else if(enter_cross == 1)
-				TraceMove(L_bias,targer_speed);
 			else 
-				TraceMove(R_bias,targer_speed);
-				
+			{
+				distance_speed= DistancePID(length);
+				TraceMove(R_bias,targer_speed+distance_speed);				
+			}
 		}
+		//追随小车 模式2
+		//从E点出发追领头小车
 		
-		
+		if(is_leader == 0 && mode == 1)
+		{
+			//targer_speed = 0.5;
+					
+			if(flag_stop == 3 && angle_z >=700)
+				TraceMove(R_bias,0.05); 
+			else if( flag_stop == 2 && angle_z >=700)
+				TraceMove(R_bias,0.05); 
+			else if( flag_stop == 1 && angle_z >=700)
+				TraceMove(0,0);//停车
+			else 
+			{
+				distance_speed= DistancePID(length);
+				TraceMove(R_bias,targer_speed+distance_speed);
+			}	
+		}
 		
 	}
 }

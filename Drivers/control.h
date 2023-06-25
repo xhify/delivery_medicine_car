@@ -12,3 +12,4 @@ struct PID
 	float kd;
 };
 void TraceMove(int TraceDate,float TarSpeed);
+float DistancePID(float length);

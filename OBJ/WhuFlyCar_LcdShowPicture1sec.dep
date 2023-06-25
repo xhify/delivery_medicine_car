@@ -1,5 +1,5 @@
 Dependencies for Project 'WhuFlyCar', Target 'LcdShowPicture1sec': (DO NOT MODIFY !)
-F (.\main.cpp)(0x6496D902)(-xc++ -std=c++11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/main.o -MD)
+F (.\main.cpp)(0x6497F50C)(-xc++ -std=c++11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/main.o -MD)
 I (..\SYSTEM\sys\sys.h)(0x64033AAA)
 I (..\USER\stm32f10x.h)(0x4D783CB5)
 I (..\CORE\core_cm3.h)(0x4D523B58)
@@ -56,7 +56,7 @@ I (..\Drivers\drv_Uart1.hpp)(0x641ABAC8)
 I (..\Drivers\drv_Uart3.hpp)(0x6494094D)
 I (..\Drivers\drv_beep.h)(0x6492671E)
 I (..\Drivers\drv_hcsr04.h)(0x6496AEF6)
-I (..\Drivers\control.h)(0x6495786E)
+I (..\Drivers\control.h)(0x6497F50C)
 I (..\Drivers\adc.h)(0x644E2A56)
 I (..\Drivers\MPU6050.h)(0x64356495)
 I (..\Drivers\mpuiic.h)(0x642D10DE)
@@ -1088,7 +1088,7 @@ I (..\STM32F10x_FWLib\inc\misc.h)(0x4D783BB4)
 I (D:\keil5.38\ARM\ARMCLANG\include\stdbool.h)(0x5AB0B858)
 I (..\Drivers\inv_mpu.h)(0x64283E22)
 I (..\SYSTEM\delay\delay.h)(0x64033757)
-F (..\Drivers\MPU6050.c)(0x64527EBC)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/mpu6050.o -MD)
+F (..\Drivers\MPU6050.c)(0x649706FD)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/mpu6050.o -MD)
 I (..\Drivers\MPU6050.h)(0x64356495)
 I (..\SYSTEM\sys\sys.h)(0x64033AAA)
 I (..\USER\stm32f10x.h)(0x4D783CB5)
@@ -1400,8 +1400,8 @@ I (..\STM32F10x_FWLib\inc\stm32f10x_wwdg.h)(0x4D783BB4)
 I (..\STM32F10x_FWLib\inc\misc.h)(0x4D783BB4)
 I (..\USER\stm32f10x_it.h)(0x4D99A427)
 F (..\Drivers\drv_beep.h)(0x6492671E)()
-F (..\Drivers\control.cpp)(0x6496CCA8)(-xc++ -std=c++11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/control.o -MD)
-I (..\Drivers\control.h)(0x6495786E)
+F (..\Drivers\control.cpp)(0x6497F50C)(-xc++ -std=c++11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/control.o -MD)
+I (..\Drivers\control.h)(0x6497F50C)
 I (..\Drivers\drv_Encoder.hpp)(0x644B3D0C)
 I (..\SYSTEM\sys\sys.h)(0x64033AAA)
 I (..\USER\stm32f10x.h)(0x4D783CB5)
@@ -1442,8 +1442,8 @@ I (D:\keil5.38\ARM\ARMCLANG\include\libcxx\stdio.h)(0x5A6914D2)
 I (D:\keil5.38\ARM\ARMCLANG\include\stdio.h)(0x5AB0B854)
 I (..\Basic\Basic.h)(0x61BF3B8F)
 I (..\SYSTEM\delay\delay.h)(0x64033757)
-F (..\Drivers\control.h)(0x6495786E)()
-F (..\Drivers\drv_hcsr04.cpp)(0x6496AFD7)(-xc++ -std=c++11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/drv_hcsr04.o -MD)
+F (..\Drivers\control.h)(0x6497F50C)()
+F (..\Drivers\drv_hcsr04.cpp)(0x6496F77C)(-xc++ -std=c++11 --target=arm-arm-none-eabi -mcpu=cortex-m3 -c-fno-rtti -funsigned-char-gdwarf-3 -O2 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../USER -I ../CORE -I ../STM32F10x_FWLib/inc -I ../SYSTEM/delay -I ../SYSTEM/sys -I ../SYSTEM/usart -I ../FreeRTOS/include -I ../FreeRTOS/portable/GCC/ARM_CM3 -I ../Drivers -I ../Basic -I ../Drivers -I ../Communication-I./RTE/_LcdShowPicture1sec-ID:/keil5.38/ARM/PACK/Keil/STM32F1xx_DFP/2.4.0/Device/Include-ID:/keil5.38/ARM/CMSIS/Include-D__UVISION_VERSION="526" -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER-o ../obj/drv_hcsr04.o -MD)
 I (..\Drivers\drv_hcsr04.h)(0x6496AEF6)
 I (..\Basic\Basic.hpp)(0x64033ED1)
 I (D:\keil5.38\ARM\ARMCLANG\include\libcxx\string.h)(0x56BD28DE)
