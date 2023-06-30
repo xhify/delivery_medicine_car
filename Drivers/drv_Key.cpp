@@ -7,6 +7,8 @@
 int tran = 0;
 static u16 Press_count;
 extern int mode,R_PWM;
+extern int wait_time,stop_time;
+extern float angle_z;
 #define KEY0  GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_0)//读取按键0
 /**************************************************************************
 函数功能：按键切换
@@ -212,10 +214,14 @@ extern "C" void EXTI0_IRQHandler(void)
 delay_ms(50); //消抖
 if(KEY0==0) //按键 KEY2
 {   
+	
 	if(mode <3)
 		mode+=1;
 	else
 		mode =0;
+	wait_time = 0;
+	angle_z = 0;
+	stop_time =0;
 }
 EXTI_ClearITPendingBit(EXTI_Line0); //清除 LINE2 上的中断标志位 
 delay_us(1);

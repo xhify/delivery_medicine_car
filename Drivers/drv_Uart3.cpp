@@ -83,9 +83,9 @@ extern "C" void USART3_IRQHandler(void)
 			start_index = 1;
 		else if (uart3_receive == 0x5b && start_index == 1 && start_flag == 0)//检查开始标志第二位
 			start_flag =1;
-		else if (uart3_receive == 0x5d && end_index == 0  && start_flag ==1)//检查结束标志第一位
+		else if (uart3_receive == 0x29 && end_index == 0  && start_flag ==1)//检查结束标志第一位
 			end_index =1;
-		else if (uart3_receive == 0x5d && end_index == 1  && start_flag == 1)//检车结束标志第二位
+		else if (uart3_receive == 0x29 && end_index == 1  && start_flag == 1)//检车结束标志第二位
 		{
 			start_flag =0;
 			end_index =0;

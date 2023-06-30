@@ -61,9 +61,9 @@ float DistancePID(float length)
 {
 	
 	float bias,Integral_bias,last_bias;
-	int LengthTarspeed;
+	float LengthTarspeed;
 	if(length<40.0)
-		bias = 20.0-length;
+		bias = length-20.0;
 	else
 		bias = 20.0;
 	Integral_bias+=bias;	            //求出偏差的积分                   
@@ -109,7 +109,7 @@ int ChangeSpeedMotorR(int NowEncodeSpdR,float TarSpdR)
 	TarEncodeSpdR=(int)(TarSpdR/3.14/0.07*1560*0.005);
 
 	bias=TarEncodeSpdR - NowEncodeSpdR;
-	pwm=L_SpeedPID(bias);
+	pwm=R_SpeedPID(bias);
 	return pwm;
 }
 
@@ -132,8 +132,8 @@ void TraceMove(int TraceDate,float TarSpeed)
 	R_speed =(float)(R_code*200.0/1560.0*0.07*3.14);
 	L_speed = L_code*200/1560.0*0.07*3.14;
 	
-	spdpwml=ChangeSpeedMotorL(L_code,TarSpeed + distancespd);
-	spdpwmr=ChangeSpeedMotorR(R_code,TarSpeed + distancespd);
+	spdpwml=ChangeSpeedMotorL(L_code , TarSpeed);
+	spdpwmr=ChangeSpeedMotorR(R_code , TarSpeed);
 	
 	
 	R_PWM=turnpwm+spdpwmr;
