@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>LcdShowPicture1sec</TargetName>
+      <TargetName>delivery_medicine_car</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pArmCC>6100001::V6.10.1::.\ARMCLANG</pArmCC>

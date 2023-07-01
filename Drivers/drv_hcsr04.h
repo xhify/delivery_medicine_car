@@ -11,6 +11,6 @@
 #define HCSR04_ECHO        GPIO_Pin_8
 
 void hcsr04Init(void);
-float UltraSonic_valuetance(void);
-//void TIM5_Cap_Init(u16 arr,u16 psc);
+void UltraSonic_valuetance(void);
+
 #endif /*__HCSR04_H */
