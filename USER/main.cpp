@@ -42,7 +42,7 @@ int L_count=0;
 int R_count=0;;
 extern int L_PWM ,R_PWM;
 char str[50];
-extern struct PID follow_PID, speed_PID, distance_PID;
+extern struct PID follow_PID, speed_PID, distance_PID,position_PID;
 int L_angle, R_angle;
 extern float length;
 float distance_speed=0;
@@ -54,7 +54,7 @@ int flag_stop=0;
 int flag_wait=0;
 int wait_time=0;
 extern int blue_flag_stop , blue_flag_wait;//蓝牙传递的停车标志
-
+extern float G_X,G_Z,G_Y;
 float angle_z = 0;
 
 /// @brief 目标速度
