@@ -3,40 +3,32 @@
 #include "Commulink.hpp"
 #include "GUI.hpp"
 #include <stdlib.h>
-#define DATA_COUNT 5 // Êı¾İµÄÊıÁ¿
+#define DATA_COUNT 5 // æ•°æ®çš„æ•°é‡
 
 
-/**
- * @brief 
- *  openMV ´«À´µÄ²ÎÊı
- * 0 ×ó²à½Ç¶È
- * 1 ÓÒ²à½Ç¶È
- * 2 ÔİÊ±Î´±»Ê¹ÓÃ
- * 3 Í£³µ±êÖ¾
- * 4 µÈ´ıÍ£³µ±êÖ¾
- */
- int openmv_data_array[DATA_COUNT] = {0}; 
-int openmv_data_index = 0; // µ±Ç°Êı¾İË÷Òı
+
+ int openmv_data_array[DATA_COUNT] = {0}; // ç”¨äºå­˜å‚¨è§£æçš„æ•´æ•°æ•°æ®
+int openmv_data_index = 0; // å½“å‰æ•°æ®ç´¢å¼•
 int uart3_receive=0;
-int start_index = 0; // »º³åÇøË÷Òı
+int start_index = 0; // ç¼“å†²åŒºç´¢å¼•
 int start_flag=0;
 int end_index=0;
 
 /*
- * º¯Êı¹¦ÄÜ£º´®¿Ú1³õÊ¼»¯
- * Èë¿Ú²ÎÊı£º²¨ÌØÂÊ
- * ·µ»Ø  Öµ£ºÎŞ
+ * å‡½æ•°åŠŸèƒ½ï¼šä¸²å£1åˆå§‹åŒ–
+ * å…¥å£å‚æ•°ï¼šæ³¢ç‰¹ç‡
+ * è¿”å›  å€¼ï¼šæ— 
  */
 void init_drv_Uart3(u32 bound)
 {
-	//GPIO¶Ë¿ÚÉèÖÃ
+	//GPIOç«¯å£è®¾ç½®
   GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
 		NVIC_InitTypeDef NVIC_InitStructure;
-	//Ê¹ÄÜUSART3£¬GPIODÊ±ÖÓ
+	//ä½¿èƒ½USART3ï¼ŒGPIODæ—¶é’Ÿ
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
-	//ÖØÓ³ÉäÊ¹ÄÜ
+	//é‡æ˜ å°„ä½¿èƒ½
 	GPIO_PinRemapConfig(GPIO_FullRemap_USART3,ENABLE);
 	//USART3_TX   GPIOD.8
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8; 
@@ -47,53 +39,53 @@ void init_drv_Uart3(u32 bound)
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOD, &GPIO_InitStructure);
-	//Usart3 NVIC ÅäÖÃ
+	//Usart3 NVIC é…ç½®
   NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0 ;//ÇÀÕ¼ÓÅÏÈ¼¶3
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 5;		//×ÓÓÅÏÈ¼¶3
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQÍ¨µÀÊ¹ÄÜ
-	NVIC_Init(&NVIC_InitStructure);	//¸ù¾İÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯VIC¼Ä´æÆ÷
-  //USART ³õÊ¼»¯ÉèÖÃ 
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0 ;//æŠ¢å ä¼˜å…ˆçº§3
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		//å­ä¼˜å…ˆçº§3
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQé€šé“ä½¿èƒ½
+	NVIC_Init(&NVIC_InitStructure);	//æ ¹æ®æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ–VICå¯„å­˜å™¨
+  //USART åˆå§‹åŒ–è®¾ç½® 
 	USART_InitStructure.USART_BaudRate = bound;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART_InitStructure.USART_Parity = USART_Parity_No;
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;	
-	//³õÊ¼»¯´®¿Ú3
+	//åˆå§‹åŒ–ä¸²å£3
   USART_Init(USART3, &USART_InitStructure); 
-	//¿ªÆô´®¿Ú½ÓÊÜÖĞ¶Ï
+	//å¼€å¯ä¸²å£æ¥å—ä¸­æ–­
   USART_ITConfig(USART3, USART_IT_RXNE,ENABLE);
-	//Ê¹ÄÜ´®¿Ú3 
+	//ä½¿èƒ½ä¸²å£3 
   USART_Cmd(USART3, ENABLE);                    
 }
 
 /*
- * º¯Êı¹¦ÄÜ£º´®¿Ú1½ÓÊÕÖĞ¶Ï
- * Èë¿Ú²ÎÊı£ºÎŞ
- * ·µ»Ø  Öµ£ºÎŞ
+ * å‡½æ•°åŠŸèƒ½ï¼šä¸²å£1æ¥æ”¶ä¸­æ–­
+ * å…¥å£å‚æ•°ï¼šæ— 
+ * è¿”å›  å€¼ï¼šæ— 
  */
 extern "C" void USART3_IRQHandler(void)
 {	
 	
 	int value;
 	
-	//½ÓÊÕµ½Êı¾İ
+	//æ¥æ”¶åˆ°æ•°æ®
 	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) 
 	{	  
-		//À¶ÑÀ½ÓÊÕÏà¹Ø±äÁ¿
+		//è“ç‰™æ¥æ”¶ç›¸å…³å˜é‡
 	   
 		
 		
 		
   	uart3_receive = USART_ReceiveData(USART3); 
-		if(uart3_receive == 0x5b && start_index == 0 && start_flag == 0)//¼ì²é¿ªÊ¼±êÖ¾µÚÒ»Î»
+		if(uart3_receive == 0x5b && start_index == 0 && start_flag == 0)//æ£€æŸ¥å¼€å§‹æ ‡å¿—ç¬¬ä¸€ä½
 			start_index = 1;
-		else if (uart3_receive == 0x5b && start_index == 1 && start_flag == 0)//¼ì²é¿ªÊ¼±êÖ¾µÚ¶şÎ»
+		else if (uart3_receive == 0x5b && start_index == 1 && start_flag == 0)//æ£€æŸ¥å¼€å§‹æ ‡å¿—ç¬¬äºŒä½
 			start_flag =1;
-		else if (uart3_receive == 0x29 && end_index == 0  && start_flag ==1)//¼ì²é½áÊø±êÖ¾µÚÒ»Î»
+		else if (uart3_receive == 0x29 && end_index == 0  && start_flag ==1)//æ£€æŸ¥ç»“æŸæ ‡å¿—ç¬¬ä¸€ä½
 			end_index =1;
-		else if (uart3_receive == 0x29 && end_index == 1  && start_flag == 1)//¼ì³µ½áÊø±êÖ¾µÚ¶şÎ»
+		else if (uart3_receive == 0x29 && end_index == 1  && start_flag == 1)//æ£€è½¦ç»“æŸæ ‡å¿—ç¬¬äºŒä½
 		{
 			start_flag =0;
 			end_index =0;

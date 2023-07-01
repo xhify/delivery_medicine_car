@@ -17,9 +17,8 @@
 #include <stdbool.h>
 #include "drv_hcsr04.h"
 #include "control.h"
-extern "C"
-{
-#include "adc.h"
+extern"C"{
+	#include "adc.h"
 #include "MPU6050.h"
 #include "mpuiic.h"
 }
@@ -39,33 +38,22 @@ extern int L_code;
 /// @brief 右侧电机编码器
 extern int R_code;
 extern float L_speed, R_speed;
-int L_count = 0;
-int R_count = 0;
-/// @brief 左右电机pwm输出
-extern int L_PWM, R_PWM;
+int L_count=0;
+int R_count=0;;
+extern int L_PWM ,R_PWM;
 char str[50];
 extern struct PID follow_PID, speed_PID, distance_PID;
 int L_angle, R_angle;
 extern float length;
-/// @brief  用来储存超声波测距得到的附加速度
-float distance_speed = 0;
-
-int i = 0;
-/// @brief 停车标志
-int flag_stop = 0;
-/// @brief 等待标志
-int flag_wait = 0;
-int start_time = 0;
-int wait_time = 0;
-
-int stop_time = 0;
-extern int blue_flag_stop, blue_flag_wait; // 蓝牙传递的停车标志
-int flag_follow = 0;
-// if((angle_z<10)||(angle_z>80&&angle_z<=100)||(angle_z>170&&angle_z<=190)||(angle_z>260&&angle_z<=280)||(angle_z>350&&angle_z<370)
-//||(angle_z>440&&angle_z<=460)||(angle_z>530&&angle_z<=550)||(angle_z>620&&angle_z<=640)||(angle_z>710&&angle_z<730)
-//||(angle_z>800&&angle_z<=820)||(angle_z>890&&angle_z<=910)||(angle_z>980&&angle_z<=1000)||(angle_z>1070))
-
-extern float G_X, G_Z, G_Y;
+float distance_speed=0;
+int enter_cross=0;
+int cross_cnt=0;//岔路口检测3.
+int i=0;
+int circle=0;//统计圈数从岔路口出来即为完成一圈。
+int flag_stop=0;
+int flag_wait=0;
+int wait_time=0;
+extern int blue_flag_stop , blue_flag_wait;//蓝牙传递的停车标志
 
 float angle_z = 0;
 
@@ -135,93 +123,82 @@ int main(void)
 	while (1)
 	{
 		
+		
+		
+		VDDA =Get_Adc_Average(12,5);
+		VDDA = VDDA *3.3*11*1.1/4096;
+		sprintf( str, "%d", mode);
+			LCD_ShowString(40,0,str,BLUE,WHITE,16,0);
+			//pitch
+			sprintf( str, "%d", is_leader);
+			LCD_ShowString(80,16,str,BLUE,WHITE,16,0);
+			//yaw
+			sprintf( str, "%3.1f",targer_speed);
+			LCD_ShowString(48,32,str,BLUE,WHITE,16,0);
+		
+		/*获取姿态*/
+			
+		sprintf( str, "%4d",L_code);	
+			LCD_ShowString(48,48,str,BLUE,WHITE,16,0);
+		
+		sprintf( str, "%4d",R_code);	
+			LCD_ShowString(48,64,str,BLUE,WHITE,16,0);
+		
+		
+		
+		sprintf( str, "%4.4f",L_speed);	
+		LCD_ShowString(120,48,str,BLUE,WHITE,16,0);
+		
+		sprintf( str, "%4.4f",R_speed);	
+		LCD_ShowString(120,64,str,BLUE,WHITE,16,0);
+		
+		sprintf( str, "%3d",L_angle);	
+		LCD_ShowString(64,80,str,BLUE,WHITE,16,0);
+		
+		
+		sprintf( str, "%3d",R_angle);	
+		LCD_ShowString(64,96,str,BLUE,WHITE,16,0);
+			
+		
+		
+		sprintf( str, "%6d",L_PWM);	
+		LCD_ShowString(48,112,str,BLUE,WHITE,16,0);
+
+		sprintf( str, "%6d",R_PWM);	
+		LCD_ShowString(48,128,str,BLUE,WHITE,16,0);	
+		
+		//循迹控制pid参数
+		sprintf( str, "%4.2f",position_PID.kp);	
+		LCD_ShowString(0,144,str,BLUE,WHITE,16,0);	
+		
+		sprintf( str, "%4.2f",position_PID.ki);	
+		LCD_ShowString(80,144,str,BLUE,WHITE,16,0);	
+		
+		sprintf( str, "%4.2f",position_PID.kd);	
+		LCD_ShowString(160,144,str,BLUE,WHITE,16,0);
+		//速度控制pid参数
+		sprintf( str, "%4.2f",speed_PID.kp);	
+		LCD_ShowString(0,160,str,BLUE,WHITE,16,0);	
+		
+		sprintf( str, "%4.2f",speed_PID.ki);	
+		LCD_ShowString(80,160,str,BLUE,WHITE,16,0);	
+		
+		sprintf( str, "%4.2f",speed_PID.kd);	
+		LCD_ShowString(160,160,str,BLUE,WHITE,16,0);	
+		
+		sprintf( str, "%4.2f",angle_z);	
+		LCD_ShowString(160,176,str,BLUE,WHITE,16,0);
+		
+		sprintf( str, "%4.2f",G_Z);	
+		LCD_ShowString(0,176,str,BLUE,WHITE,16,0);
+		
+		sprintf( str, "%2.2f",VDDA);	
+		LCD_ShowString(160,0,str,BLUE,WHITE,16,0);	
+		
+		
+		LCD_ShowString(0,208,rec,BLUE,WHITE,16,0);
+		
 	
-		VDDA = Get_Adc_Average(12, 5);
-		VDDA = VDDA * 3.3 * 11 * 1.1 / 4096;
-		/**
-		 * @brief 屏幕显示部分
-		 */
-		{
-			sprintf(str, "%d", mode);
-			LCD_ShowString(40, 0, str, BLUE, WHITE, 16, 0);
-			// pitch
-			sprintf(str, "%d", is_leader);
-			LCD_ShowString(80, 16, str, BLUE, WHITE, 16, 0);
-			// yaw
-			sprintf(str, "%3.1f", targer_speed);
-			LCD_ShowString(48, 32, str, BLUE, WHITE, 16, 0);
-
-			/*获取姿态*/
-
-			sprintf(str, "%4d", L_code);
-			LCD_ShowString(48, 48, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4d", R_code);
-			LCD_ShowString(48, 64, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.4f", L_speed);
-			LCD_ShowString(120, 48, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.4f", R_speed);
-			LCD_ShowString(120, 64, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%3d", L_angle);
-			LCD_ShowString(64, 80, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%3d", R_angle);
-			LCD_ShowString(64, 96, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%6d", L_PWM);
-			LCD_ShowString(48, 112, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%6d", R_PWM);
-			LCD_ShowString(48, 128, str, BLUE, WHITE, 16, 0);
-
-			// 循迹控制pid参数
-			sprintf(str, "%4.2f", follow_PID.kp);
-			LCD_ShowString(0, 144, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", follow_PID.ki);
-			LCD_ShowString(80, 144, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4d", i);
-			LCD_ShowString(160, 144, str, BLUE, WHITE, 16, 0);
-			// 速度控制pid参数
-			sprintf(str, "%4.2f", speed_PID.kp);
-			LCD_ShowString(0, 160, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", speed_PID.ki);
-			LCD_ShowString(80, 160, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", speed_PID.kd);
-			LCD_ShowString(160, 160, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", distance_PID.kp);
-			LCD_ShowString(0, 176, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", distance_PID.ki);
-			LCD_ShowString(80, 176, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", distance_PID.kd);
-			LCD_ShowString(160, 176, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", angle_z);
-			LCD_ShowString(160, 192, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", distance_speed);
-			LCD_ShowString(80, 192, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", G_Z);
-			LCD_ShowString(0, 192, str, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%2.2f", VDDA);
-			LCD_ShowString(160, 0, str, BLUE, WHITE, 16, 0);
-
-			LCD_ShowString(0, 208, rec, BLUE, WHITE, 16, 0);
-
-			sprintf(str, "%4.2f", length);
-			LCD_ShowString(0, 224, str, BLUE, WHITE, 16, 0);
-		}
 		
 	}
 }
@@ -233,12 +210,11 @@ extern "C" void TIM2_IRQHandler(void)
 	int index;
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
 	{
-		// 清除 TIM2更新 中断 标志
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-		int L_bias = L_angle - 90;
-		int R_bias = R_angle - 90;
-
-		UltraSonic_valuetance();
+		//清除 TIM2更新 中断 标志
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update ); 	
+		//if(i >= 10)
+		Get_Angle(2);
+		angle_z+=(G_Z+0.55)*0.005;			
 		i++;
 		L_angle = openmv_data_array[0];
 		R_angle = openmv_data_array[1];
